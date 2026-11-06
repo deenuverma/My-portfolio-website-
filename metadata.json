@@ -1,0 +1,6 @@
+{
+  "name": "The H Portfolio - Cinematic Portfolio Builder",
+  "description": "Interactive cinematic personal portfolio based on The-H-Portfolio-Template with live preview, easy customization, and export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

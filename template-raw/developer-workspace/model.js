@@ -1,0 +1,29 @@
+export const STATUSES={todo:'Up next',building:'In progress',done:'Shipped'};
+export const LANGUAGES=['JavaScript','TypeScript','Python','HTML','CSS','SQL','Bash','JSON','Markdown','Other'];
+export const uid=()=>globalThis.crypto?.randomUUID?.()||`id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,11)}`;
+export function safeUrl(value){const url=new URL(value);if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw new Error('Use a complete http:// or https:// link without a username or password.');return url.href;}
+export function makeBackup(workspace){return {format:'devdesk',version:1,exportedAt:new Date().toISOString(),workspace};}
+export function validateBackup(raw){
+ if(new TextEncoder().encode(JSON.stringify(raw)).length>2*1024*1024)throw new Error('Workspace is larger than 2 MB. Shorten large snippets or remove old items after exporting a backup.');
+ if(!raw||raw.format!=='devdesk'||raw.version!==1||!raw.workspace)throw new Error('This is not a supported DevDesk backup (version 1).');
+ const w=raw.workspace;const arrays={projects:200,tasks:5000,snippets:500,links:1000};for(const [key,max]of Object.entries(arrays)){if(!Array.isArray(w[key])||w[key].length>max)throw new Error(`The ${key} list is missing or too large.`);}
+ const ids=new Set();function id(v){if(typeof v!=='string'||!/^[-a-zA-Z0-9_]{1,100}$/.test(v)||ids.has(v))throw new Error('Backup contains invalid or duplicate item IDs.');ids.add(v);return v;}
+ function str(v,max,required=false){if(typeof v!=='string'||v.length>max||(required&&!v.trim()))throw new Error('Backup contains missing or oversized text fields.');return v;}
+ const projects=w.projects.map(p=>({id:id(p.id),name:str(p.name,80,true),description:str(p.description,300)}));const projectIds=new Set(projects.map(p=>p.id));
+ function ref(v){if(!projectIds.has(v))throw new Error('A backup item refers to a missing project.');return v;}
+ const tasks=w.tasks.map(t=>{if(!Object.hasOwn(STATUSES,t.status)||!['task','bug'].includes(t.type)||!Array.isArray(t.checklist)||t.checklist.length>20)throw new Error('Backup contains an invalid task.');return {id:id(t.id),projectId:ref(t.projectId),title:str(t.title,120,true),description:str(t.description,2000),type:t.type,status:t.status,checklist:t.checklist.map(c=>{if(typeof c.done!=='boolean')throw new Error('Invalid checklist state.');return {text:str(c.text,150,true),done:c.done};})};});
+ const snippets=w.snippets.map(s=>{if(!LANGUAGES.includes(s.language)||typeof s.pinned!=='boolean')throw new Error('Backup contains an invalid snippet.');return {id:id(s.id),projectId:ref(s.projectId),title:str(s.title,100,true),language:s.language,code:str(s.code,50000,true),pinned:s.pinned};});
+ const links=w.links.map(l=>({id:id(l.id),projectId:ref(l.projectId),title:str(l.title,100,true),url:safeUrl(str(l.url,2000,true))}));
+ return {projects,tasks,snippets,links,activeProjectId:projectIds.has(w.activeProjectId)?w.activeProjectId:projects[0]?.id||null,dismissedNotice:w.dismissedNotice===true};
+}
+export function removeProject(state,id){return {...state,projects:state.projects.filter(p=>p.id!==id),tasks:state.tasks.filter(t=>t.projectId!==id),snippets:state.snippets.filter(s=>s.projectId!==id),links:state.links.filter(l=>l.projectId!==id),activeProjectId:state.activeProjectId===id?state.projects.find(p=>p.id!==id)?.id||null:state.activeProjectId};}
+export function starter(){return {activeProjectId:'relink',dismissedNotice:false,projects:[{id:'relink',name:'ReLink UOG',description:'Lost and found MVP · Sample project board'},{id:'portfolio',name:'Portfolio',description:'Personal developer website · Sample project board'}],tasks:[
+ {id:'t1',projectId:'relink',title:'Add item filters',description:'Let people browse lost and found reports by category.',type:'task',status:'todo',checklist:[]},
+ {id:'t2',projectId:'relink',title:'Write setup guide',description:'Explain how to run the project locally.',type:'task',status:'todo',checklist:[]},
+ {id:'t3',projectId:'relink',title:'Check mobile layout',description:'Review the browsing and report screens on a phone.',type:'task',status:'todo',checklist:[]},
+ {id:'t4',projectId:'relink',title:'Build report form',description:'',type:'task',status:'building',checklist:[{text:'Create form fields',done:true},{text:'Connect to backend',done:false},{text:'Test form submission',done:false}]},
+ {id:'t5',projectId:'relink',title:'Fix image preview',description:'Handle an unsupported image with a clear message.',type:'bug',status:'building',checklist:[]},
+ {id:'t6',projectId:'relink',title:'Create browse page',description:'',type:'task',status:'done',checklist:[]},
+ {id:'t7',projectId:'relink',title:'Add form labels',description:'',type:'task',status:'done',checklist:[]},
+ {id:'t8',projectId:'portfolio',title:'Choose featured projects',description:'Use real work and explain what each project does.',type:'task',status:'todo',checklist:[]}
+ ],snippets:[{id:'s1',projectId:'relink',title:'FastAPI health route',language:'Python',pinned:true,code:'from fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get("/health")\ndef health():\n    return {"status": "ok"}'},{id:'s2',projectId:'relink',title:'Filter items by search',language:'JavaScript',pinned:false,code:'const visibleItems = items.filter((item) =>\n  item.title.toLowerCase().includes(query.toLowerCase())\n);'},{id:'s3',projectId:'portfolio',title:'Responsive grid',language:'CSS',pinned:true,code:'.projects {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\n  gap: 1.5rem;\n}'}],links:[{id:'l1',projectId:'relink',title:'GitHub profile',url:'https://github.com/Hamza-Muhammadi'},{id:'l2',projectId:'relink',title:'FastAPI documentation',url:'https://fastapi.tiangolo.com/'},{id:'l3',projectId:'portfolio',title:'Live portfolio',url:'https://hamza-muhammadi.github.io/Ameer-Hamza-Portfolio/'}]};}

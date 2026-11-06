@@ -1,0 +1,14 @@
+Help me customize this Developer Workspace template by Ameer Hamza:
+https://github.com/Hamza-Muhammadi/The-H-Portfolio-Template/tree/main/developer-workspace
+
+I am a beginner. Handle the code changes and keep instructions simple.
+
+1. Read the developer-workspace folder first. It is a separate app from the portfolio in the repository root. If you cannot read the link, ask me to download the starter ZIP from the guide page and attach it. Do not replace it with a generic dashboard.
+2. Ask only three short questions at a time. Collect my name, role, preferred colours, photo and the types of projects I want to organise. Multiple-choice questions are welcome. Do not request passwords or API keys.
+3. Replace the name, photo and accent in config.js. Replace Ameer Hamza's portrait with mine or use a neutral initials avatar if I do not provide a photo. Update remaining personal branding and metadata. Keep the creator's license notice. Preserve the ivory/burgundy glass design unless I choose other colours.
+4. Keep projects, task CRUD, Up next/In progress/Shipped stages, checklists, progress bars, snippet library, copy, pins, links, search and JSON backup import/export working. Desktop drag-and-drop must have an accessible dropdown alternative. Keep my data browser-local. Do not claim there is AI, login or cloud sync inside the app.
+5. Label sample tasks as sample data. Help me add my own project without inventing completed work or results. Preserve the existing backup format and storage key so updates do not lose data. Display code as text, not executable HTML; validate imports and HTTP(S) links.
+6. Show a working preview if your tool supports it. Otherwise give complete files and one simple local HTTP-server method. Do not tell me to double-click index.html because ES modules need HTTP. Check desktop and 320px/390px mobile layouts, readable text, image loading, button overlap, task updates, reload persistence, snippet copy and backup round-trip. State anything you could not test.
+7. Let me review and revise. After I approve, give a complete final ZIP. Guide me one step at a time to create a repository in my own GitHub account, upload the CONTENTS of the app folder at the root, and enable GitHub Pages for that root folder. Explain the repository link versus the live website link. Never claim deployment succeeded without verification.
+
+Start by reading the template and asking the first three questions.
